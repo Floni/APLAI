@@ -1,8 +1,8 @@
 :- lib(ic).
 :- lib(matrix_util).
 
-:- ['utils.pl'].
-:- ['sudex_toledo.pl'].
+:- ensure_loaded('utils.pl').
+:- ensure_loaded('sudex_toledo.pl').
 
 % constraint that asserts: A == B // N
 div_constraint(A, B, N) :-
@@ -48,33 +48,39 @@ to_new_viewpoint(P, Pout) :-
         )
     ).
 
+new_constraints(Pout) :-
+    check_rows(Pout),
+    check_cols(Pout),
+    check_box_new(Pout).
+
 % solves the given sudoku using the new viewpoint
 % (first converts the list to a matrix and then solves)
 solve_new(P) :-
     to_matrix(P, Parray),
     to_new_viewpoint(Parray, Pout),
-    Pout :: 1..9,
 
-    check_rows(Pout),
-    check_cols(Pout),
-    check_box_new(Pout),
+    Pout :: 1..9,
+    new_constraints(Pout),
 
     array_flat(2, Pout, Pflat),
     labeling(Pflat),
-
     writeln(Pout).
 
+% solvse all sudokus
 solutions_new :-
     findall(P-Name, puzzles(P, Name), L),
-    ( foreach(P-Name, L)
+    ( foreach(P-Name, L),
+      foreach(Time, Times)
     do
         writeln(Name),
         cputime(Start),
         solve_new(P),
         cputime(End),
-        Diff is End - Start,
-        %print_sudoku(P),
+        Time is End - Start,
         write('time elapsed: '),
-        writeln(Diff),
+        writeln(Time),
         write('\n')
-    ).
+    ),
+    sum(Times, S),
+    writeln(Times),
+    writeln(S).

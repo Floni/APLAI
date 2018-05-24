@@ -1,8 +1,8 @@
 :- lib(ic).
 :- lib(matrix_util).
 
-:- ['utils.pl'].
-:- ['sudex_toledo.pl'].
+:- ensure_loaded('utils.pl').
+:- ensure_loaded('sudex_toledo.pl').
 
 
 % check if all 3x3 boxes in P contain different values.
@@ -19,28 +19,35 @@ check_boxes(P) :-
       )
     ).
 
+orig_constraints(Parray) :-
+    check_rows(Parray),
+    check_cols(Parray),
+    check_boxes(Parray).
+
 % solves the puzzle P
 solve(P) :-
     P :: 1..9,
     to_matrix(P, Parray),
-    check_rows(Parray),
-    check_cols(Parray),
-    check_boxes(Parray),
+    orig_constraints(Parray),
     array_flat(2, Parray, Pflat),
     labeling(Pflat).
 
 % solves all sudokus while printing their name and runtime
 solutions :-
     findall(P-Name, puzzles(P, Name), L),
-    ( foreach(P-Name, L)
+    ( foreach(P-Name, L),
+      foreach(Time, Times)
     do
         writeln(Name),
         cputime(Start),
         solve(P),
         cputime(End),
-        Diff is End - Start,
+        Time is End - Start,
         print_sudoku(P),
         write('time elapsed: '),
-        writeln(Diff),
+        writeln(Time),
         write('\n')
-    ).
+    ),
+    sum(Times, S),
+    writeln(Times),
+    writeln(S).
