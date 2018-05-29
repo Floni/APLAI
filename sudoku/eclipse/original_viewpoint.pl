@@ -1,8 +1,8 @@
 :- lib(ic).
 :- lib(matrix_util).
 
-:- ensure_loaded('utils.pl').
-:- ensure_loaded('sudex_toledo.pl').
+:- ensure_loaded('common.pl').
+:- ensure_loaded('../sudex_toledo.pl').
 
 
 % check if all 3x3 boxes in P contain different values.

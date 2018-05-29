@@ -1,8 +1,8 @@
 :- lib(ic).
 :- lib(matrix_util).
 
-:- ensure_loaded('utils.pl').
-:- ensure_loaded('sudex_toledo.pl').
+:- ensure_loaded('common.pl').
+:- ensure_loaded('../sudex_toledo.pl').
 
 :- ensure_loaded('original_viewpoint.pl').
 :- ensure_loaded('new_viewpoint.pl').
