@@ -2,6 +2,9 @@
 
 :- ensure_loaded('../puzzles.pl').
 
+% builds the domain for the hitori puzzle
+% each variable's domain contains it's orginal value and negative the variable's number
+% representing that the variable is a black cell
 build_domains(Size, P, Pmat) :-
     dim(Pmat, [Size, Size]),
     ( for(I, 1, Size),
@@ -18,6 +21,7 @@ build_domains(Size, P, Pmat) :-
         )
     ).
 
+% row contraint: each value of a row should be different
 row_constraint(Size, Pmat) :-
     ( for(I, 1, Size),
       param(Pmat)
@@ -26,6 +30,7 @@ row_constraint(Size, Pmat) :-
         alldifferent(Row)
     ).
 
+% column contraint: each value of a column should be different
 col_constraint(Size, Pmat) :-
     ( for(I, 1, Size),
       param(Pmat, Size)
@@ -34,6 +39,7 @@ col_constraint(Size, Pmat) :-
         alldifferent(Col)
     ).
 
+% adjacent black cells contraint: two black cells cannot be vertically or horizontally adjacent
 adj_constraint(Size, Pmat) :-
     ( for(I, 1, Size),
       param(Size, Pmat)
@@ -57,6 +63,7 @@ adj_constraint(Size, Pmat) :-
         )
     ).
 
+% generalization of the corner close, close edge and quad middle contraints
 close_constraint(Size, Pmat) :-
     ( for(I, 1, Size),
       param(Size, Pmat)
@@ -96,6 +103,7 @@ close_constraint(Size, Pmat) :-
         )
     ).
 
+% sandwich pair contraint
 sandwich_double_constraint(Size, Pmat) :-
     ( for(I, 1, Size),
       param(Size, Pmat)
@@ -121,6 +129,7 @@ sandwich_double_constraint(Size, Pmat) :-
         )
     ).
 
+% sandwich triple contraint
 sandwich_triple_constraint(Size, Pmat) :-
     ( for(I, 1, Size),
       param(Size, Pmat)
@@ -150,6 +159,7 @@ sandwich_triple_constraint(Size, Pmat) :-
         )
     ).
 
+% set black contraint
 set_black_constraint(Size, Pmat) :-
     ( for(I, 1, Size),
       param(Size, Pmat)
@@ -185,6 +195,7 @@ set_black_constraint(Size, Pmat) :-
         )
     ).
 
+% counts the amount of white cells in the hitori puzzle
 white_squares(Size, Pmat, Sum) :-
     ( for(I, 1, Size),
       fromto(0, Bin, Bout, Btot),
@@ -201,6 +212,7 @@ white_squares(Size, Pmat, Sum) :-
     ),
     Sum #= eval(Btot).
 
+% finds the first white square
 find_white_square(_Size, Pmat, X, Y, X, Y) :-
     Elem is Pmat[X, Y],
     Elem > 0, !.
@@ -213,17 +225,19 @@ find_white_square(Size, Pmat, _X, Y, Xo, Yo) :-
     Y1 is Y + 1,
     find_white_square(Size, Pmat, 1, Y1, Xo, Yo).
 
-
+% Checks whether the neighbour is within bounds, not black and not visited
 check_neighbour(Size, Pmat, X, Y, Visited) :-
     X > 0, Y > 0, X =< Size, Y =< Size, % bounds
     Elem is Pmat[X, Y], Elem > 0,       % not blacked
     \+ member(X-Y, Visited).            % not visited
 
+% generates a list of all possible neighbours of a cell
 all_neighbours(X, Y, L) :-
     X1 is X - 1, X2 is X + 1,
     Y1 is Y - 1, Y2 is Y + 1,
     L = [X1-Y, X2-Y, X-Y1, X-Y2].
 
+% Dijkstra's algorithm to count the amount of white cells contected to the first one
 count_connected(_Size, _Pmat, [], Visited, Visited).
 count_connected(Size, Pmat, [X-Y|ToVisited], VisitedIn, VisitedOut) :-
     all_neighbours(X, Y, AllNeighs),
@@ -232,6 +246,7 @@ count_connected(Size, Pmat, [X-Y|ToVisited], VisitedIn, VisitedOut) :-
     append(Neighs, VisitedIn, VisitedIn1),
     count_connected(Size, Pmat, ToVisit, VisitedIn1, VisitedOut).
 
+% prints the given hitori puzzle
 print_hitori(Size, Pmat) :-
     ( for(I, 1, Size),
       param(Size, Pmat)
@@ -250,6 +265,7 @@ print_hitori(Size, Pmat) :-
         nl
     ).
 
+% solves the given hitori puzzle
 solve(Size, P, Pmat) :-
     build_domains(Size, P, Pmat),
     row_constraint(Size, Pmat),
@@ -270,7 +286,7 @@ solve(Size, P, Pmat) :-
     count_connected(Size, Pmat, [X-Y], [X-Y], Connected),
     length(Connected, Tot).
 
-% solves all hitori while printing their name and runtime
+% solves all hitori puzzles while printing their name and runtime
 solutions :-
     findall(Id-Size-P, puzzle(Id, Size, P), L),
     ( foreach(Id-Size-P, L),
