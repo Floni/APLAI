@@ -65,7 +65,7 @@ solve_new(P) :-
     labeling(Pflat),
     writeln(Pout).
 
-% solvse all sudokus
+% solvse all sudokus using the new viewpoint
 solutions_new :-
     findall(P-Name, puzzles(P, Name), L),
     ( foreach(P-Name, L),
