@@ -7,7 +7,8 @@
 :- ensure_loaded('original_viewpoint.pl').
 :- ensure_loaded('new_viewpoint.pl').
 
-
+% channeling between the original and the new viewpoint
+% the viewpoints have their columns and values swapped
 channeling(Porig, Pnew) :-
     ( for(Row, 1, 9),
       param(Porig, Pnew)
@@ -26,10 +27,11 @@ channeling(Porig, Pnew) :-
         )
     ).
 
+% solves the given sudoku using both channeled viewpoints
 chan_solve(P) :-
     P :: 1..9,
     to_matrix(P, Parray),
-    %dim(Pnew, [9, 9]),
+
     to_new_viewpoint(Parray, Pnew),
     Pnew :: 1..9,
 
@@ -40,6 +42,7 @@ chan_solve(P) :-
     array_flat(2, Parray, Pflat),
     labeling(Pflat).
 
+% solves all sudokus using the channeled viewpoints
 solutions_chan :-
     findall(P-Name, puzzles(P, Name), L),
     ( foreach(P-Name, L),

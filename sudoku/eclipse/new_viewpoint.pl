@@ -9,6 +9,7 @@ div_constraint(A, B, N) :-
     B #> A * N,
     B #=< A * N + N.
 
+% check the box constraint in the new viewpoint
 check_box_new(P) :-
     ( foreach(BR, [1, 4, 7]),
       param(P)
@@ -17,20 +18,17 @@ check_box_new(P) :-
           param(P, BR)
         do
             Box is P[BR..BR+2, BV],
-            %writeln(Box),
             dim(BoxCols, [3]),
             ( foreachelem(Col, Box),
               foreachelem(BC, BoxCols)
             do
-                %writeln(Col-BC),
                 div_constraint(BC, Col, 3)
             ),
-            %writeln(BoxCols),
             alldifferent(BoxCols)
         )
     ).
 
-% converts a sudoku matrix to the new viewpoit
+% converts a sudoku matrix to the new viewpoint
 to_new_viewpoint(P, Pout) :-
     dim(Pout, [9, 9]),
     ( for(Row, 1, 9),
@@ -48,6 +46,7 @@ to_new_viewpoint(P, Pout) :-
         )
     ).
 
+% checks the contraints of the new viewpoint
 new_constraints(Pout) :-
     check_rows(Pout),
     check_cols(Pout),

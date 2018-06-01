@@ -19,6 +19,7 @@ check_boxes(P) :-
       )
     ).
 
+% check all constraints
 orig_constraints(Parray) :-
     check_rows(Parray),
     check_cols(Parray),
