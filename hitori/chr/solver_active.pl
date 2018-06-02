@@ -1,6 +1,6 @@
 :- use_module(library(chr)).
-%:- chr_option(debug,off).
-%:- chr_option(optimize,full).
+:- chr_option(debug,off).
+:- chr_option(optimize,full).
 
 :- ensure_loaded('../puzzles.pl').
 :- op(700, xfx, 'can_be').
@@ -102,6 +102,28 @@ is_black(Row1, Col1), possible_val(Row2, Col2, Pval) \ Pval can_be N <=> adjacen
                                                                        | Pval = N.
 % two black cells are not adjacent
 is_black(Row1, Col1), is_black(Row2, Col2) ==> not_adjacent(Row1, Col1, Row2, Col2).
+
+
+% quad middle vertical contraint
+is_black(Row1, Col1), is_black(Row2, Col2), is_black(Row1, Col3), possible_val(Row4, Col2, Pval) \ Pval can_be N <=>
+                                                                     Vdiff is Row1 - Row2, 1 is abs(Vdiff),
+                                                                     Col2 is Col1 + 1, Col3 is Col2 + 1, Row4 is Row1 - Vdiff
+                                                                    | Pval = N.
+% quad middle horizontal contraint
+is_black(Row1, Col1), is_black(Row2, Col2), is_black(Row3, Col1), possible_val(Row2, Col4, Pval) \ Pval can_be N <=>
+                                                                     Hdiff is Col1 - Col2, 1 is abs(Hdiff),
+                                                                     Row2 is Row1 + 1, Row3 is Row2 + 1, Col4 is Col1 - Hdiff
+                                                                    | Pval = N.
+
+% sandwich pair contraint horizontal
+possible_val(Row1, Col1, Val1), Val1 can_be N,
+possible_val(Row1, Col2, Val2), Val2 can_be N,
+possible_val(Row1, Col3, Val3) \ Val3 can_be N1 <=> Col1 is Col3 - 1, Col2 is Col3 + 1 | Val3 = N1.
+
+% sandwich pair contraint vertical
+possible_val(Row1, Col1, Val1), Val1 can_be N,
+possible_val(Row2, Col1, Val2), Val2 can_be N,
+possible_val(Row3, Col1, Val3) \ Val3 can_be N1 <=> Row1 is Row3 - 1, Row2 is Row3 + 1 | Val3 = N1.
 
 % enumerates the elements within a row
 enum_cols([])                   <=> true.
