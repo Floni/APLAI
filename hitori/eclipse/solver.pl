@@ -5,16 +5,18 @@
 % builds the domain for the hitori puzzle
 % each variable's domain contains it's orginal value and negative the variable's number
 % representing that the variable is a black cell
-build_domains(Size, P, Pmat) :-
+build_domains(Size, P, Pmat, Porig) :-
     dim(Pmat, [Size, Size]),
+    dim(Porig, [Size, Size]),
     ( for(I, 1, Size),
       foreach(Prow, P),
-      param(Size, Pmat)
+      param(Size, Pmat, Porig)
     do
         ( for(J, 1, Size),
           foreach(Pelem, Prow),
-          param(Size, I, Pmat)
+          param(Size, I, Pmat, Porig)
         do
+            Pelem is Porig[I, J],
             Elem is Pmat[I, J],
             BlackN is -((I-1) * Size + J),
             Elem :: [Pelem, BlackN]
@@ -105,58 +107,60 @@ close_constraint(Size, Pmat) :-
 
 % sandwich pair contraint
 % TODO: needs to use the original matrix to check equality
-sandwich_double_constraint(Size, Pmat) :-
+sandwich_double_constraint(Size, Pmat, Porig) :-
     ( for(I, 1, Size),
-      param(Size, Pmat)
+      param(Size, Pmat, Porig)
     do
         ( for(J, 1, Size),
-          param(I, Size, Pmat)
+          param(I, Size, Pmat, Porig)
         do
             Elem is Pmat[I, J],
             ((I < Size, I > 1) ->
-                Belem1 is Pmat[I+1, J],
-                Belem2 is Pmat[I-1, J],
-                #=(Belem1, Belem2, B1),
-                #>(Elem, 0, B2),
-                B1 => B2
+                Belem1 is Porig[I+1, J],
+                Belem2 is Porig[I-1, J],
+                (Belem1 =:= Belem2 ->
+                    Elem #> 0
+                ; true)
             ; true),
             ((J < Size, J > 1) ->
-                Relem1 is Pmat[I, J+1],
-                Relem2 is Pmat[I, J-1],
-                #=(Relem1, Relem2, B3),
-                #>(Elem, 0, B4),
-                B3 => B4
+                Relem1 is Porig[I, J+1],
+                Relem2 is Porig[I, J-1],
+                (Relem1 =:= Relem2 ->
+                    Elem #>0
+                ; true)
             ; true)
         )
     ).
 
 % sandwich triple contraint
 % TODO: needs to use the original matrix to check equality
-sandwich_triple_constraint(Size, Pmat) :-
+sandwich_triple_constraint(Size, Pmat, Porig) :-
     ( for(I, 1, Size),
-      param(Size, Pmat)
+      param(Size, Pmat, Porig)
     do
         ( for(J, 1, Size),
-          param(I, Size, Pmat)
+          param(I, Size, Pmat, Porig)
         do
-            Elem is Pmat[I, J],
+            Elem is Porig[I, J],
             ((I < Size, I > 1) ->
-                Belem1 is Pmat[I+1, J],
-                Belem2 is Pmat[I-1, J],
-                #=(Belem1, Belem2, B1),
-                #=(Belem1, Elem, B2),
-                #<(Belem1, 0, B3),
-                #<(Belem2, 0, B4),
-                B1 and B2 => B3 and B4
+                Belem1 is Porig[I+1, J],
+                Belem2 is Porig[I-1, J],
+                Bel1 is Pmat[I+1, J],
+                Bel2 is Pmat[I-1, J],
+                ((Belem1 =:= Belem2, Belem1 =:= Elem) ->
+                    Bel1 #< 0,
+                    Bel2 #< 0
+                ; true)
             ; true),
             ((J < Size, J > 1) ->
-                Relem1 is Pmat[I, J+1],
-                Relem2 is Pmat[I, J-1],
-                #=(Relem1, Relem2, B5),
-                #=(Relem1, Elem, B6),
-                #<(Relem1, 0, B7),
-                #<(Relem2, 0, B8),
-                B5 and B6 => B7 and B8
+                Relem1 is Porig[I, J+1],
+                Relem2 is Porig[I, J-1],
+                Rel1 is Pmat[I, J+1],
+                Rel2 is Pmat[I, J-1],
+                ((Relem1 =:= Relem2, Relem1 =:= Elem) ->
+                    Rel1 #< 0,
+                    Rel2 #< 0
+                ; true)
             ; true)
         )
     ).
@@ -269,14 +273,14 @@ print_hitori(Size, Pmat) :-
 
 % solves the given hitori puzzle
 solve(Size, P, Pmat) :-
-    build_domains(Size, P, Pmat),
+    build_domains(Size, P, Pmat, Porig),
     row_constraint(Size, Pmat),
     col_constraint(Size, Pmat),
     adj_constraint(Size, Pmat),
 
     close_constraint(Size, Pmat),
-    sandwich_double_constraint(Size, Pmat),
-    sandwich_triple_constraint(Size, Pmat),
+    sandwich_double_constraint(Size, Pmat, Porig),
+    sandwich_triple_constraint(Size, Pmat, Porig),
     set_black_constraint(Size, Pmat),
 
     white_squares(Size, Pmat, Tot),
