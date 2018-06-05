@@ -1,4 +1,5 @@
 :- lib(ic).
+%:- import alldifferent/1 from ic_global.
 :- lib(matrix_util).
 
 :- ensure_loaded('common.pl').
@@ -54,7 +55,7 @@ new_constraints(Pout) :-
 
 % solves the given sudoku using the new viewpoint
 % (first converts the list to a matrix and then solves)
-solve_new(P) :-
+solve_new(P, Pout, B) :-
     to_matrix(P, Parray),
     to_new_viewpoint(Parray, Pout),
 
@@ -62,24 +63,27 @@ solve_new(P) :-
     new_constraints(Pout),
 
     array_flat(2, Pout, Pflat),
-    labeling(Pflat),
-    writeln(Pout).
+    search(Pflat, 0, input_order, indomain, complete, [backtrack(B)]).
 
 % solvse all sudokus using the new viewpoint
 solutions_new :-
     findall(P-Name, puzzles(P, Name), L),
     ( foreach(P-Name, L),
-      foreach(Time, Times)
+      foreach(Time, Times),
+      foreach(Back, Backs)
     do
         writeln(Name),
         cputime(Start),
-        solve_new(P),
+        solve_new(P, Pout, Back),
         cputime(End),
+        writeln(Pout),
+
         Time is End - Start,
-        write('time elapsed: '),
-        writeln(Time),
+        write('backtracks: '), writeln(Back),
+        write('time elapsed: '), writeln(Time),
         write('\n')
     ),
     sum(Times, S),
-    writeln(Times),
-    writeln(S).
+    sum(Backs, B),
+    write('total backs: '), writeln(B),
+    write('total time: '), writeln(S).

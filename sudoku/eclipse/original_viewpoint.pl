@@ -1,4 +1,5 @@
 :- lib(ic).
+%:- import alldifferent/1 from ic_global.
 :- lib(matrix_util).
 
 :- ensure_loaded('common.pl').
@@ -26,29 +27,32 @@ orig_constraints(Parray) :-
     check_boxes(Parray).
 
 % solves the puzzle P
-solve(P) :-
+solve(P, B) :-
     P :: 1..9,
     to_matrix(P, Parray),
     orig_constraints(Parray),
     array_flat(2, Parray, Pflat),
-    labeling(Pflat).
+    search(Pflat, 0, first_fail, indomain, complete, [backtrack(B)]).
 
 % solves all sudokus while printing their name and runtime
 solutions :-
     findall(P-Name, puzzles(P, Name), L),
     ( foreach(P-Name, L),
-      foreach(Time, Times)
+      foreach(Time, Times),
+      foreach(Back, Backs)
     do
         writeln(Name),
         cputime(Start),
-        solve(P),
+        solve(P, Back),
         cputime(End),
         Time is End - Start,
         print_sudoku(P),
+        write('backtracks: '),
+        write(Back), write(' & '),
         write('time elapsed: '),
-        writeln(Time),
-        write('\n')
+        writeln(Time), nl
     ),
     sum(Times, S),
-    writeln(Times),
-    writeln(S).
+    sum(Backs, B),
+    write('total backs: '), writeln(B),
+    write('total time: '), writeln(S).

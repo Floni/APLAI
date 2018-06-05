@@ -1,4 +1,5 @@
 :- lib(ic).
+%:- import alldifferent/1 from ic_global.
 :- lib(matrix_util).
 
 :- ensure_loaded('common.pl').
@@ -28,7 +29,7 @@ channeling(Porig, Pnew) :-
     ).
 
 % solves the given sudoku using both channeled viewpoints
-chan_solve(P) :-
+chan_solve(P, B) :-
     P :: 1..9,
     to_matrix(P, Parray),
 
@@ -40,24 +41,28 @@ chan_solve(P) :-
     channeling(Parray, Pnew),
 
     array_flat(2, Parray, Pflat),
-    labeling(Pflat).
+    search(Pflat, 0, first_fail, indomain, complete, [backtrack(B)]).
 
 % solves all sudokus using the channeled viewpoints
 solutions_chan :-
     findall(P-Name, puzzles(P, Name), L),
     ( foreach(P-Name, L),
-      foreach(Time, Times)
+      foreach(Time, Times),
+      foreach(Back, Backs)
     do
         writeln(Name),
         cputime(Start),
-        chan_solve(P),
+        chan_solve(P, Back),
         cputime(End),
         Time is End - Start,
         print_sudoku(P),
+        write('backtracks: '),
+         writeln(Back),
         write('time elapsed: '),
-        writeln(Time),
-        write('\n')
+         writeln(Time),
+        nl
     ),
     sum(Times, S),
-    writeln(Times),
-    writeln(S).
+    sum(Backs, B),
+    write('total backs: '), writeln(B),
+    write('total time: '), writeln(S).

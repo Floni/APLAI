@@ -58,7 +58,7 @@ adj_constraint(Size, Pmat) :-
                 Relem is Pmat[I, J+1],
                 #<(Relem, 0, B3),
                 #<(Elem, 0, B4),
-                B3 + B4 #\= 2 
+                B3 + B4 #\= 2
             ; true)
         )
     ).
@@ -91,7 +91,7 @@ close_constraint(Size, Pmat) :-
             ;
                 B3 = 1
             ),
-            
+
             (J < Size ->
                 Elem4 is Pmat[I, J+1],
                 #<(Elem4, 0, B4)
@@ -104,6 +104,7 @@ close_constraint(Size, Pmat) :-
     ).
 
 % sandwich pair contraint
+% TODO: needs to use the original matrix to check equality
 sandwich_double_constraint(Size, Pmat) :-
     ( for(I, 1, Size),
       param(Size, Pmat)
@@ -130,6 +131,7 @@ sandwich_double_constraint(Size, Pmat) :-
     ).
 
 % sandwich triple contraint
+% TODO: needs to use the original matrix to check equality
 sandwich_triple_constraint(Size, Pmat) :-
     ( for(I, 1, Size),
       param(Size, Pmat)
@@ -186,7 +188,7 @@ set_black_constraint(Size, Pmat) :-
                 #>(Elem3, 0, B3),
                 B => B3
             ; true ),
-            
+
             (J < Size ->
                 Elem4 is Pmat[I, J+1],
                 #>(Elem4, 0, B4),
@@ -259,7 +261,7 @@ print_hitori(Size, Pmat) :-
                 write(Elem),
                 write(' ')
             ;
-                write('X ') 
+                write('X ')
             )
         ),
         nl
@@ -276,7 +278,7 @@ solve(Size, P, Pmat) :-
     sandwich_double_constraint(Size, Pmat),
     sandwich_triple_constraint(Size, Pmat),
     set_black_constraint(Size, Pmat),
-    
+
     white_squares(Size, Pmat, Tot),
 
     array_flat(2, Pmat, Pflat),
