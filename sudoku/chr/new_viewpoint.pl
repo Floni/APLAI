@@ -19,7 +19,7 @@ boxes_get_heads([], Heads, Heads, Rest, Rest).
 boxes_get_heads([[H|HRest]|L], HeadsIn, HeadsOut, RestIn, RestOut) :-
     boxes_get_heads(L, [H|HeadsIn], HeadsOut, [HRest|RestIn], RestOut).
 
-% adds the box contraints the the given rows
+% adds the box contraints for the given rows
 boxes_new_cols([[]|_]).
 boxes_new_cols(L) :-
     boxes_get_heads(L, [], [H1, H2, H3], [], Rest),
@@ -63,7 +63,7 @@ solve_all_new([P-Name|R], TimesIn, TimesOut) :-
     Start is cputime,
     solve_new(P),
     End is cputime,
-    %writeln(P),
+    writeln(P),
     Time is End - Start,
     write('time elapsed: '),
     writeln(Time),

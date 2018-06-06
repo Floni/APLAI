@@ -13,7 +13,7 @@
 solve_rows([]).
 solve_rows([Row|R]) :- all_dif(Row), solve_rows(R).
 
-% generates the first column the rows
+% generates the first column of the given rows
 col_generator([], Heads, Heads, Rests, Rests).
 col_generator([[H|R]| L], HeadsIn, HeadsOut, RestsIn, RestsOut) :-
     col_generator(L, [H|HeadsIn], HeadsOut, [R|RestsIn], RestsOut).
@@ -35,11 +35,6 @@ all_dif([El|NextElems]) :-
 _ not_in [].
 X not_in [E|L] :- X not_eq E, X not_in L. 
 
-% remove duplicates
-%X not_eq Y \ X not_eq Y <=> true.
-% enforce symmetry
-%X not_eq Y <=> Y @< X | Y not_eq X.
-
 % not equal contraint
 % if both variables are grounded they should not be equal
 X not_eq N          <=> number(X), number(N) | X =\= N.
@@ -49,7 +44,7 @@ X not_eq N \ N in L <=> number(X), delete(L, X, L1), L \== L1 | N in L1.
 X not_eq N \ X in L <=> number(N), delete(L, N, L1), L \== L1 | X in L1.
 
 % box contraint
-% two variables (with the same value) should be in different boxes
+% two variables with the same value should be in different boxes
 X not_box_eq N          <=> number(X), number(N) | 
                             X1 is X - 1, N1 is N - 1,
                             BX is X1 // 3, BN is N1 // 3,

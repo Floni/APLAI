@@ -28,7 +28,7 @@ channeling(Porig, Pnew) :-
         )
     ).
 
-% solves the given sudoku using both channeled viewpoints
+% solves the given sudoku using the channeled viewpoints
 chan_solve(P, B) :-
     P :: 1..9,
     to_matrix(P, Parray),

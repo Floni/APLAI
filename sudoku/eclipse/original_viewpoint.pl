@@ -6,7 +6,7 @@
 :- ensure_loaded('../sudex_toledo.pl').
 
 
-% check if all 3x3 boxes in P contain different values.
+% check if all 3x3 boxes in P contain all different values.
 check_boxes(P) :-
     ( foreach(BR, [1, 4, 7]),
       param(P)
@@ -34,7 +34,7 @@ solve(P, B) :-
     array_flat(2, Parray, Pflat),
     search(Pflat, 0, first_fail, indomain, complete, [backtrack(B)]).
 
-% solves all sudokus while printing their name and runtime
+% solves all sudokus while printing their name, solution and runtime
 solutions :-
     findall(P-Name, puzzles(P, Name), L),
     ( foreach(P-Name, L),
@@ -48,7 +48,7 @@ solutions :-
         Time is End - Start,
         print_sudoku(P),
         write('backtracks: '),
-        write(Back), write(' & '),
+        write(Back),
         write('time elapsed: '),
         writeln(Time), nl
     ),
