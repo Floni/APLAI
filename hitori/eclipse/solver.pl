@@ -106,7 +106,6 @@ close_constraint(Size, Pmat) :-
     ).
 
 % sandwich pair contraint
-% TODO: needs to use the original matrix to check equality
 sandwich_double_constraint(Size, Pmat, Porig) :-
     ( for(I, 1, Size),
       param(Size, Pmat, Porig)
@@ -133,7 +132,6 @@ sandwich_double_constraint(Size, Pmat, Porig) :-
     ).
 
 % sandwich triple contraint
-% TODO: needs to use the original matrix to check equality
 sandwich_triple_constraint(Size, Pmat, Porig) :-
     ( for(I, 1, Size),
       param(Size, Pmat, Porig)
@@ -142,12 +140,14 @@ sandwich_triple_constraint(Size, Pmat, Porig) :-
           param(I, Size, Pmat, Porig)
         do
             Elem is Porig[I, J],
+            El is Pmat[I, J],
             ((I < Size, I > 1) ->
                 Belem1 is Porig[I+1, J],
                 Belem2 is Porig[I-1, J],
                 Bel1 is Pmat[I+1, J],
                 Bel2 is Pmat[I-1, J],
                 ((Belem1 =:= Belem2, Belem1 =:= Elem) ->
+                    El #> 0,
                     Bel1 #< 0,
                     Bel2 #< 0
                 ; true)
@@ -158,6 +158,7 @@ sandwich_triple_constraint(Size, Pmat, Porig) :-
                 Rel1 is Pmat[I, J+1],
                 Rel2 is Pmat[I, J-1],
                 ((Relem1 =:= Relem2, Relem1 =:= Elem) ->
+                    El #> 0,
                     Rel1 #< 0,
                     Rel2 #< 0
                 ; true)
