@@ -3,8 +3,8 @@
 :- ensure_loaded('../puzzles.pl').
 
 % builds the domain for the hitori puzzle
-% each variable's domain contains it's orginal value and negative the variable's number
-% representing that the variable is a black cell
+% each variable's domain contains it's orginal value and
+% a negative number representing a black cell.
 build_domains(Size, P, Pmat, Porig) :-
     dim(Pmat, [Size, Size]),
     dim(Porig, [Size, Size]),
@@ -65,7 +65,12 @@ adj_constraint(Size, Pmat) :-
         )
     ).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Additional constraints: %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % generalization of the corner close, close edge and quad middle contraints
+% guarantees local connectivity for white cells.
 close_constraint(Size, Pmat) :-
     ( for(I, 1, Size),
       param(Size, Pmat)
@@ -105,7 +110,8 @@ close_constraint(Size, Pmat) :-
         )
     ).
 
-% sandwich pair contraint
+% sandwich pair contraint: 
+% a cell surrounded by two same valued cells must be white
 sandwich_double_constraint(Size, Pmat, Porig) :-
     ( for(I, 1, Size),
       param(Size, Pmat, Porig)
@@ -131,7 +137,9 @@ sandwich_double_constraint(Size, Pmat, Porig) :-
         )
     ).
 
-% sandwich triple contraint
+% sandwich triple contraint:
+% three same valued cells next to eachother,
+% the middle must be white and the others must be black.
 sandwich_triple_constraint(Size, Pmat, Porig) :-
     ( for(I, 1, Size),
       param(Size, Pmat, Porig)
@@ -166,7 +174,8 @@ sandwich_triple_constraint(Size, Pmat, Porig) :-
         )
     ).
 
-% set black contraint
+% set black contraint:
+% all four neighbours of a black cell must be white.
 set_black_constraint(Size, Pmat) :-
     ( for(I, 1, Size),
       param(Size, Pmat)
@@ -201,6 +210,10 @@ set_black_constraint(Size, Pmat) :-
             ; true )
         )
     ).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Connectivity Constraint: %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % counts the amount of white cells in the hitori puzzle
 white_squares(Size, Pmat, Sum) :-
@@ -275,25 +288,29 @@ print_hitori(Size, Pmat) :-
 % solves the given hitori puzzle
 solve(Size, P, Pmat) :-
     build_domains(Size, P, Pmat, Porig),
+
     row_constraint(Size, Pmat),
     col_constraint(Size, Pmat),
     adj_constraint(Size, Pmat),
 
+    % additional constraints:
     close_constraint(Size, Pmat),
     sandwich_double_constraint(Size, Pmat, Porig),
     sandwich_triple_constraint(Size, Pmat, Porig),
     set_black_constraint(Size, Pmat),
 
+    % count white cells:
     white_squares(Size, Pmat, Tot),
 
     array_flat(2, Pmat, Pflat),
     labeling(Pflat),
 
+    % connectivity constraint:
     find_white_square(Size, Pmat, 1, 1, X, Y),
     count_connected(Size, Pmat, [X-Y], [X-Y], Connected),
     length(Connected, Tot).
 
-% solves all hitori puzzles while printing their name and runtime
+% solves all hitori puzzles while printing their id and runtime
 solutions :-
     findall(Id-Size-P, puzzle(Id, Size, P), L),
     ( foreach(Id-Size-P, L),
