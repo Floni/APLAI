@@ -3,6 +3,7 @@
 :- chr_option(optimize,full).
 
 :- ensure_loaded('../puzzles.pl').
+:- ensure_loaded('common.pl').
 :- op(700,xfx,'can_be').
 
 :- chr_constraint possible_val/3, is_black/2, has_val/3, enum_cols/1, can_be/2, marked/2, not_marked/2, start/0, end/0, size/1.
@@ -22,7 +23,7 @@ make_domains(Nrow, [Row|Rest], [OutRow|OutRest]) :-
     Nrow1 is Nrow + 1,
     make_domains(Nrow1, Rest, OutRest).
 
-% sets the 
+% sets the cell to the right final representation
 possible_val(Row, Col, Val) <=> number(Val), Val =:= 0 | is_black(Row, Col).
 possible_val(Row, Col, Val) <=> number(Val), Val > 0   | has_val(Row, Col, Val).
 
@@ -46,9 +47,9 @@ has_val(_, Col1, Val), possible_val(_, Col1, Pval) \ Pval can_be Val <=> Pval = 
 has_val(Row1, Col1, Val), has_val(Row2, Col2, Val) ==> Row1 =\= Row2, Col1 =\= Col2.
 
 % no black cells next to eachother
-is_black(Row1, Col1), possible_val(Row2, Col2, Pval) \ Pval can_be N <=> adjacent(Row1, Col1, Row2, Col2) 
+is_black(Row1, Col1), possible_val(Row2, Col2, Pval) \ Pval can_be N <=> adjacent(Row1, Col1, Row2, Col2)
                                                                        | Pval = N.
-% two black cells are not adjacent                                                                       
+% two black cells are not adjacent
 is_black(Row1, Col1), is_black(Row2, Col2) ==> not_adjacent(Row1, Col1, Row2, Col2).
 
 % quad middle vertical contraint
@@ -63,14 +64,14 @@ is_black(Row1, Col1), is_black(Row2, Col2), is_black(Row3, Col1), possible_val(R
                                                                     | Pval = N.
 
 % sandwich pair contraint horizontal
-possible_val(Row1, Col1, Val1), Val1 can_be N, 
+possible_val(Row1, Col1, Val1), Val1 can_be N,
 possible_val(Row1, Col2, Val2), Val2 can_be N,
-possible_val(Row1, Col3, Val3) \ Val3 can_be N1 <=> Col1 is Col3 - 1, Col2 is Col3 + 1 | Val3 = N1. 
+possible_val(Row1, Col3, Val3) \ Val3 can_be N1 <=> Col1 is Col3 - 1, Col2 is Col3 + 1 | Val3 = N1.
 
 % sandwich pair contraint vertical
 possible_val(Row1, Col1, Val1), Val1 can_be N,
 possible_val(Row2, Col1, Val2), Val2 can_be N,
-possible_val(Row3, Col1, Val3) \ Val3 can_be N1 <=> Row1 is Row3 - 1, Row2 is Row3 + 1 | Val3 = N1. 
+possible_val(Row3, Col1, Val3) \ Val3 can_be N1 <=> Row1 is Row3 - 1, Row2 is Row3 + 1 | Val3 = N1.
 
 % mark one white cell and unmark all other white cells
 has_val(Row, Col, _) \ start            <=> marked(Row, Col).
@@ -79,7 +80,7 @@ has_val(Row, Col, _)                    ==> not_marked(Row, Col).
 marked(Row, Col) \ not_marked(Row, Col) <=> true.
 
 % mark a cell if it is not black and is adjacent to a marked cell
-marked(Row1, Col1), has_val(Row2, Col2, _) \ not_marked(Row2, Col2) <=> adjacent(Row1, Col1, Row2, Col2) 
+marked(Row1, Col1), has_val(Row2, Col2, _) \ not_marked(Row2, Col2) <=> adjacent(Row1, Col1, Row2, Col2)
                                                                         | marked(Row2, Col2).
 
 % If some white cell is not marked at the end the solution does not respect the connected whites constraint
@@ -117,11 +118,11 @@ solve_all([Id-Size-P|R], TimesIn, TimesOut) :-
     Start is cputime,
     solve(Size, P, Pout),
     End is cputime,
-    writeln(Pout),
+    print_hitori(Pout),
     Time is End - Start,
     write('time elapsed: '),
     writeln(Time),
-    write('\n'),
+    nl,
     solve_all(R, [Time|TimesIn], TimesOut).
 
 % solves all hitori puzzles and prints total elapsed time

@@ -3,6 +3,7 @@
 :- chr_option(optimize,full).
 
 :- ensure_loaded('../puzzles.pl').
+:- ensure_loaded('common.pl').
 :- op(700, xfx, 'can_be').
 
 :- chr_constraint
@@ -154,19 +155,6 @@ solve(Size, P, Pout) :-
     enum_rows(Pout),
     end.
 
-print_val(0) :- write('x'), !.
-print_val(V) :- write(V).
-
-print_row([]).
-print_row([V|Rest]) :-
-    print_val(V), write(' '),
-    print_row(Rest).
-
-print_hitori([]).
-print_hitori([Row|Rest]) :-
-    print_row(Row), nl,
-    print_hitori(Rest).
-
 % solves the list of hitori puzzles and returns the time each one took
 solve_all([], Times, Times).
 solve_all([Id-Size-P|R], TimesIn, TimesOut) :-
@@ -174,7 +162,7 @@ solve_all([Id-Size-P|R], TimesIn, TimesOut) :-
     Start is cputime,
     solve(Size, P, Pout),
     End is cputime,
-    writeln(Pout),
+    print_hitori(Pout),
     Time is End - Start,
     write('time elapsed: '),
     writeln(Time),
