@@ -63,7 +63,7 @@ solve_all_new([P-Name|R], TimesIn, TimesOut) :-
     Start is cputime,
     solve_new(P),
     End is cputime,
-    %writeln(P),
+    writeln(P),
     Time is End - Start,
     write('time elapsed: '),
     writeln(Time),

@@ -48,7 +48,7 @@ solutions :-
         Time is End - Start,
         print_sudoku(P),
         write('backtracks: '),
-        write(Back), write(' & '),
+        write(Back),
         write('time elapsed: '),
         writeln(Time), nl
     ),
