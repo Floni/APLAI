@@ -3,7 +3,7 @@
 :- ensure_loaded('new_viewpoint.pl').
 :- ensure_loaded('../sudex_toledo.pl').
 
-% channeling between both viewpoints
+% generate the channeling between both viewpoints
 channeling(Pa, Pb) :-
     generate_channel(Pa, Pb),
     generate_channel(Pb, Pa).

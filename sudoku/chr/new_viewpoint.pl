@@ -19,7 +19,7 @@ boxes_get_heads([], Heads, Heads, Rest, Rest).
 boxes_get_heads([[H|HRest]|L], HeadsIn, HeadsOut, RestIn, RestOut) :-
     boxes_get_heads(L, [H|HeadsIn], HeadsOut, [HRest|RestIn], RestOut).
 
-% adds the box contraints the the given rows
+% adds the box contraints for the given rows
 boxes_new_cols([[]|_]).
 boxes_new_cols(L) :-
     boxes_get_heads(L, [], [H1, H2, H3], [], Rest),

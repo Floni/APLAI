@@ -7,7 +7,7 @@ solve(P) :- makedomains(P), solve_sudoku(P), enum(P).
 % adds all contraints for the given sudoku
 solve_sudoku(P) :- solve_rows(P), solve_cols(P), solve_boxes(P).
 
-% generates a list of boxes for the given row group
+% generate a box for the given row group
 box_cols_helper([], BL, BL, R, R).
 box_cols_helper([[H1, H2, H3|R]|L], BoxListIn, BoxListOut, RestIn, RestOut) :-
     box_cols_helper(L, [H1, H2, H3|BoxListIn], BoxListOut, [R|RestIn], RestOut).
